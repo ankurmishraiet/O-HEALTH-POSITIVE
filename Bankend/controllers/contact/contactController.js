@@ -74,6 +74,7 @@ const createContact = async (req, res) => {
     if (!process.env.ADMIN_EMAIL) {
       console.error("ADMIN_EMAIL is missing.");
     } else {
+        console.log("CONTACT: sending email to admin");
       sendEmail({
         to: process.env.ADMIN_EMAIL,
         subject: "New Contact Enquiry - O Positive Health",
