@@ -28,6 +28,7 @@ const createContact = async (req, res) => {
 
     // 2. Validate email
     const normalizedEmail = email.trim().toLowerCase();
+
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailPattern.test(normalizedEmail)) {
@@ -50,7 +51,7 @@ const createContact = async (req, res) => {
       normalizedPhone = normalizedPhone.slice(2);
     }
 
-    // Your current Contact model allows only 10 digits
+    // Validate 10-digit Indian mobile number
     if (!/^[6-9]\d{9}$/.test(normalizedPhone)) {
       return res.status(400).json({
         success: false,
@@ -69,13 +70,11 @@ const createContact = async (req, res) => {
 
     console.log("Contact enquiry saved:", contact._id);
 
-    // 5. Send admin notification separately
-    try {
-      if (!process.env.ADMIN_EMAIL) {
-        throw new Error("ADMIN_EMAIL is missing.");
-      }
-
-      await sendEmail({
+    // 5. Send admin notification without blocking the response
+    if (!process.env.ADMIN_EMAIL) {
+      console.error("ADMIN_EMAIL is missing.");
+    } else {
+      sendEmail({
         to: process.env.ADMIN_EMAIL,
         subject: "New Contact Enquiry - O Positive Health",
         text: [
@@ -90,17 +89,19 @@ const createContact = async (req, res) => {
           `Enquiry ID: ${contact._id}`,
           `Submitted: ${contact.createdAt}`,
         ].join("\n"),
-      });
-
-      console.log("Admin notification email sent successfully");
-    } catch (emailError) {
-      console.error(
-        "Admin notification email failed:",
-        emailError.message
-      );
+      })
+        .then(() => {
+          console.log("Admin notification email sent successfully");
+        })
+        .catch((emailError) => {
+          console.error(
+            "Admin notification email failed:",
+            emailError.message
+          );
+        });
     }
 
-    // 6. Return success even if email delivery fails
+    // 6. Return success immediately
     return res.status(201).json({
       success: true,
       message: "Your enquiry has been submitted successfully.",
@@ -113,16 +114,15 @@ const createContact = async (req, res) => {
   } catch (error) {
     console.error("Contact API error:", error);
 
-    // Duplicate email
+    // Handle duplicate email
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
-        message:
-          "An enquiry with this email already exists.",
+        message: "An enquiry with this email already exists.",
       });
     }
 
-    // Mongoose validation error
+    // Handle Mongoose validation errors
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
