@@ -7,7 +7,7 @@ const createContact = async (req, res) => {
   try {
     const { name, email, phone, subject, message } = req.body;
 
-    // Validate required fields
+    // 1. Validate required fields
     if (
       typeof name !== "string" ||
       typeof email !== "string" ||
@@ -22,44 +22,57 @@ const createContact = async (req, res) => {
     ) {
       return res.status(400).json({
         success: false,
-        message:
-          "Name, email, phone, subject and message are required.",
+        message: "All fields are required.",
       });
     }
 
-    // Validate email format
+    // 2. Validate email
+    const normalizedEmail = email.trim().toLowerCase();
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailPattern.test(email.trim())) {
+    if (!emailPattern.test(normalizedEmail)) {
       return res.status(400).json({
         success: false,
         message: "Please provide a valid email address.",
       });
     }
 
-    // Validate phone number
-    const normalizedPhone = phone.replace(/[\s()-]/g, "");
+    // 3. Normalize Indian phone numbers
+    let normalizedPhone = phone.replace(/[\s()-]/g, "");
 
-    if (!/^\+?[0-9]{10,15}$/.test(normalizedPhone)) {
+    // Accept +91 or 91 prefix
+    if (normalizedPhone.startsWith("+91")) {
+      normalizedPhone = normalizedPhone.slice(3);
+    } else if (
+      normalizedPhone.startsWith("91") &&
+      normalizedPhone.length === 12
+    ) {
+      normalizedPhone = normalizedPhone.slice(2);
+    }
+
+    // Your current Contact model allows only 10 digits
+    if (!/^[6-9]\d{9}$/.test(normalizedPhone)) {
       return res.status(400).json({
         success: false,
-        message: "Please provide a valid phone number.",
+        message: "Please enter a valid 10-digit Indian mobile number.",
       });
     }
 
-    // Save enquiry to MongoDB
+    // 4. Save enquiry to MongoDB
     const contact = await Contact.create({
       name: name.trim(),
-      email: email.trim().toLowerCase(),
+      email: normalizedEmail,
       phone: normalizedPhone,
       subject: subject.trim(),
       message: message.trim(),
     });
 
-    // Notify admin by email; do not fail the enquiry if email fails
+    console.log("Contact enquiry saved:", contact._id);
+
+    // 5. Send admin notification separately
     try {
       if (!process.env.ADMIN_EMAIL) {
-        throw new Error("ADMIN_EMAIL is missing in .env");
+        throw new Error("ADMIN_EMAIL is missing.");
       }
 
       await sendEmail({
@@ -76,8 +89,6 @@ const createContact = async (req, res) => {
           "",
           `Enquiry ID: ${contact._id}`,
           `Submitted: ${contact.createdAt}`,
-          "",
-          "Please review this enquiry in the admin dashboard.",
         ].join("\n"),
       });
 
@@ -89,6 +100,7 @@ const createContact = async (req, res) => {
       );
     }
 
+    // 6. Return success even if email delivery fails
     return res.status(201).json({
       success: true,
       message: "Your enquiry has been submitted successfully.",
@@ -101,15 +113,29 @@ const createContact = async (req, res) => {
   } catch (error) {
     console.error("Contact API error:", error);
 
+    // Duplicate email
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "An enquiry with this email already exists.",
+      });
+    }
+
+    // Mongoose validation error
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Please check the submitted contact details.",
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: "Unable to submit your enquiry right now.",
     });
   }
 };
-
-
-
 
 // 2. Admin: Get all contact enquiries
 const getContacts = async (req, res) => {
