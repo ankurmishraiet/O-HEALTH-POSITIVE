@@ -15,7 +15,6 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 
-const { verifyEmailConnection } = require("./utils/sendEmail");
 const connectionDB = require("./config/db");
 
 // Routes
@@ -189,8 +188,6 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await connectionDB();
-
-    await verifyEmailConnection();
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

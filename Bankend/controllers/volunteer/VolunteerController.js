@@ -99,32 +99,31 @@ const registerVolunteer = async (req, res) => {
     // Email notification is optional; save should remain successful
     // Send email in the background; don't wait for it
 if (process.env.ADMIN_EMAIL) {
-  sendEmail({
-    to: process.env.ADMIN_EMAIL,
-    subject: "New Campaign Request - O Positive Health",
-    text: [
-      "A new campaign request has been submitted.",
-      "",
-      `Campaigner: ${campaign.campaignerName}`,
-      `Cause: ${campaign.cause}`,
-      `Email: ${campaign.email}`,
-      `Phone: ${campaign.phone}`,
-      `Social links: ${campaign.socialLinks.join(", ") || "None"}`,
-      "",
-      "Description:",
-      campaign.description,
-      "",
-      `Campaign ID: ${campaign._id}`,
-      `Status: ${campaign.status}`,
-    ].join("\n"),
-  })
-    .then(() => console.log("Campaign notification email sent"))
-    .catch((emailError) =>
-      console.error(
-        "Campaign notification email failed:",
-        emailError.message
-      )
-    );
+ sendEmail({
+  to: process.env.ADMIN_EMAIL,
+  subject: "New Campaign Request - O Positive Health",
+  text: [
+    "A new campaign request has been submitted.",
+    "",
+    `Campaigner: ${campaign.campaignerName}`,
+    `Cause: ${campaign.cause}`,
+    `Email: ${campaign.email}`,
+    `Phone: ${campaign.phone}`,
+    `Social links: ${campaign.socialLinks.join(", ") || "None"}`,
+    "",
+    "Description:",
+    campaign.description,
+    "",
+    `Campaign ID: ${campaign._id}`,
+    `Status: ${campaign.status}`,
+  ].join("\n"),
+})
+  .then((result) =>
+    console.log("Campaign notification email accepted:", result?.id)
+  )
+  .catch((emailError) =>
+    console.error("Campaign notification email failed:", emailError.message)
+  );
 } else {
   console.error("ADMIN_EMAIL is missing.");
 }

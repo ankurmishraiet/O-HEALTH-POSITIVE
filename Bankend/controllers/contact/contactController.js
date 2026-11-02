@@ -71,36 +71,35 @@ const createContact = async (req, res) => {
     console.log("Contact enquiry saved:", contact._id);
 
     // 5. Send admin notification without blocking the response
-    if (!process.env.ADMIN_EMAIL) {
-      console.error("ADMIN_EMAIL is missing.");
-    } else {
-        console.log("CONTACT: sending email to admin");
-      sendEmail({
-        to: process.env.ADMIN_EMAIL,
-        subject: "New Contact Enquiry - O Positive Health",
-        text: [
-          "A new contact enquiry has been submitted.",
-          "",
-          `Name: ${contact.name}`,
-          `Email: ${contact.email}`,
-          `Phone: ${contact.phone}`,
-          `Subject: ${contact.subject}`,
-          `Message: ${contact.message}`,
-          "",
-          `Enquiry ID: ${contact._id}`,
-          `Submitted: ${contact.createdAt}`,
-        ].join("\n"),
-      })
-        .then(() => {
-          console.log("Admin notification email sent successfully");
-        })
-        .catch((emailError) => {
-          console.error(
-            "Admin notification email failed:",
-            emailError.message
-          );
-        });
-    }
+   // 5. Send admin notification without blocking the response
+if (!process.env.ADMIN_EMAIL) {
+  console.error("ADMIN_EMAIL is missing.");
+} else {
+  console.log("CONTACT: sending email to admin");
+
+  sendEmail({
+    to: process.env.ADMIN_EMAIL,
+    subject: "New Contact Enquiry - O Positive Health",
+    text: [
+      "A new contact enquiry has been submitted.",
+      "",
+      `Name: ${contact.name}`,
+      `Email: ${contact.email}`,
+      `Phone: ${contact.phone}`,
+      `Subject: ${contact.subject}`,
+      `Message: ${contact.message}`,
+      "",
+      `Enquiry ID: ${contact._id}`,
+      `Submitted: ${contact.createdAt}`,
+    ].join("\n"),
+  })
+    .then((result) => {
+      console.log("Admin notification email accepted:", result?.id);
+    })
+    .catch((emailError) => {
+      console.error("Admin notification email failed:", emailError.message);
+    });
+}
 
     // 6. Return success immediately
     return res.status(201).json({
