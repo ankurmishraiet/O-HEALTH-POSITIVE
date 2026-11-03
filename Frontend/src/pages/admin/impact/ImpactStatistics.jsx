@@ -1,4 +1,4 @@
-import "./ImpactStatistics.css"
+import "./ImpactStatistics.css";
 import { useEffect, useState } from "react";
 import {
   getImpactStats,
@@ -68,10 +68,6 @@ function ImpactStatistics() {
         livesImpacted: String(data.livesImpacted ?? 0),
       });
 
-      // Determine whether the record already exists.
-      // The public GET endpoint returns zeros if no record exists,
-      // so use the admin GET endpoint or its response metadata
-      // if your backend provides it.
       setExists(Boolean(result.exists));
     } catch (err) {
       setError(
@@ -131,9 +127,17 @@ function ImpactStatistics() {
     setSaving(true);
 
     try {
-      const result = exists
-        ? await updateImpactStats(payload)
-        : await createImpactStats(payload);
+      let result;
+
+      try {
+        result = await updateImpactStats(payload);
+      } catch (err) {
+        if (err.response?.status === 404) {
+          result = await createImpactStats(payload);
+        } else {
+          throw err;
+        }
+      }
 
       if (!result?.success) {
         throw new Error(result?.message || "Unable to save statistics.");
