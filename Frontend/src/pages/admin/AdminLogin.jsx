@@ -54,8 +54,8 @@ function AdminLogin() {
        <div className="admin-login-brand">
   <img src={logo} alt="O Positive Health logo" className="admin-login-logo" />
 
-  <h2>O POSITIVE HEALTH</h2>
-  <p className="admin-login-tagline">CARE BEFORE CURE</p>
+  <h2>O POSITIVE HEALTH FOUNDATION</h2>
+  <p className="admin-login-tagline">HOPE STARTS HERE</p>
 </div>
 
         <div className="admin-login-heading">
