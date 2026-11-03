@@ -27,6 +27,12 @@
 }
 
 .admin-login-logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.admin-login-logo {
   width: 64px;
   height: 64px;
   display: flex;

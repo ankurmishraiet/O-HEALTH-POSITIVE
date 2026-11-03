@@ -15,6 +15,7 @@ import VolunteersSection from "./Voluenteer/Voluenteer";
 import ManageVendors from "./vendor/ManageVendors";
 import ImpactStatistics from "./impact/ImpactStatistics"
 import "./AdminDashboard.css";
+import logo from "../../assets/logo.jpeg"
 
 const STATUSES = ["Pending", "In Progress", "Resolved"];
 
@@ -251,13 +252,17 @@ function AdminDashboard() {
             {/* Sidebar */}
             <aside className="admin-sidebar">
                 <div className="dashboard-brand">
-                    <div className="dashboard-logo">O+</div>
+  <img
+    src={logo}
+    alt="O Positive Health logo"
+    className="dashboard-logo"
+  />
 
-                    <div>
-                        <h2>O Positive</h2>
-                        <p>HEALTH FOUNDATION</p>
-                    </div>
-                </div>
+  <div>
+    <h2>O Positive</h2>
+    <p>HEALTH FOUNDATION</p>
+  </div>
+</div>
 
                 <div className="dashboard-nav-label">
                     WORKSPACE

@@ -64,7 +64,11 @@
     border-right: 1px solid var(--admin-border);
     background: var(--admin-white);
 }
-
+.dashboard-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
 .dashboard-brand {
     display: flex;
     align-items: center;

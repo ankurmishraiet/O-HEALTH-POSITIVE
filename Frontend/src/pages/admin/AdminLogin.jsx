@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginAdmin } from "../../services/adminService";
 import "./AdminLogin.css";
-
+import logo from "../../assets/logo.jpeg"
 function AdminLogin() {
   const navigate = useNavigate();
 
@@ -51,12 +51,12 @@ function AdminLogin() {
   return (
     <main className="admin-login-page">
       <section className="admin-login-card">
-        <div className="admin-login-brand">
-          <div className="admin-login-logo">O+</div>
+       <div className="admin-login-brand">
+  <img src={logo} alt="O Positive Health logo" className="admin-login-logo" />
 
-          <h2>O POSITIVE HEALTH</h2>
-          <p className="admin-login-tagline">CARE BEFORE CURE</p>
-        </div>
+  <h2>O POSITIVE HEALTH</h2>
+  <p className="admin-login-tagline">CARE BEFORE CURE</p>
+</div>
 
         <div className="admin-login-heading">
           <span className="admin-login-eyebrow">ADMIN PORTAL</span>
