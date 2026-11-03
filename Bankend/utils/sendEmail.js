@@ -11,9 +11,9 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_APP_PASSWORD?.replace(/\s/g, ""),
   },
 
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 20000,
+  connectionTimeout: 30000,
+greetingTimeout: 30000,
+socketTimeout: 30000,
 });
 
 // Debug SMTP configuration without exposing the password
