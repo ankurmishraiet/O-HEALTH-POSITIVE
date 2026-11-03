@@ -51,6 +51,7 @@ app.use(helmet());
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://o-health-positive-1-29up.onrender.com",
   "https://o-health-positive-2.onrender.com",
   "https://o-health-positive-x3ej-seven.vercel.app",
 ];
